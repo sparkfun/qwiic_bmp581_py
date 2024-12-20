@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_template_ex1_title.py TODO: replace template and title
+# qwiic_bmp581_ex7_nvm.py
 #
-# TODO: Add description for this example
+# This example demonstrates how to read basic temperature and pressure values from the Qwiic BMP581
 #-------------------------------------------------------------------------------
-# Written by SparkFun Electronics, TODO: month and year
+# Written by SparkFun Electronics, December 2024
 #
 # This python library supports the SparkFun Electroncis Qwiic ecosystem
 #
@@ -33,26 +33,52 @@
 # SOFTWARE.
 #===============================================================================
 
-import qwiic_template # TODO Import correct package
+import qwiic_bmp581
 import sys
+import time
+
+
+# Data to write into the NVM. In this case we're going to store some
+# characters, but any 6 bytes of data can be stored
+dataToWrite = "Hello!"
 
 def runExample():
-	# TODO Replace template and title
-	print("\nQwiic Template Example 1 - Title\n")
+	print("\nQwiic Template Example 7 - NVM\n")
 
 	# Create instance of device
-	myDevice = qwiic_template.QwiicTemplate() # TODO update as needed
+	myBMP581 = qwiic_bmp581.QwiicBMP581()
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
-		print("The device isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
+	if myBMP581.is_connected() == False:
+		print("The device isn't connected to the system. Please check your connection", file=sys.stderr)
 		return
 
 	# Initialize the device
-	myDevice.begin()
+	if myBMP581.begin() == False:
+		print("Unable to Initialize device! Please check your connection and try again.", file=sys.stderr)
+		return
+	
+	print("BMP581 connected!")
 
-	# TODO Add basic example code
+	print ("Writing data to NVM:", dataToWrite)
+	# The BMP581 contains non-volatile memory (NVM) that is primarily used for
+    # calibration data internally by the sensor. However 6 bytes are user programmable,
+    # stored in 3 2-byte locations (0x20 - 0x22).
+	dataIndex = 0
+	for addr in range(myBMP581.kNvmStartAddr, myBMP581.kNvmEndAddr + 1):
+		data = ord(dataToWrite[dataIndex]) | (ord(dataToWrite[dataIndex + 1]) << 8)
+		myBMP581.nvm_write(addr, data) 
+		dataIndex += 2
+
+	print("Data read back from NVM:")
+
+	# Now we can read back the data and display it
+	for addr in range(myBMP581.kNvmStartAddr, myBMP581.kNvmEndAddr + 1):
+		data = myBMP581.nvm_read(addr)
+		print(chr(data & 0xFF), end='')
+		print(chr((data >> 8) & 0xFF), end='')
+
+	return
 
 if __name__ == '__main__':
 	try:
