@@ -33,7 +33,7 @@
 # SOFTWARE.
 #===============================================================================
 
-"""
+"""!
 qwiic_bmp581
 ============
 Python module for the [SparkFun Qwiic BMP581](https://www.sparkfun.com/products/20170)
@@ -456,15 +456,13 @@ class QwiicBMP581(object):
     kChipId = 0x50
 
     def __init__(self, address=None, i2c_driver=None):
-        """
+        """!
         Constructor
 
-        :param address: The I2C address to use for the device
+        @param int, optional address: The I2C address to use for the device
             If not provided, the default address is used
-        :type address: int, optional
-        :param i2c_driver: An existing i2c driver object
+        @param I2CDriver, optional i2c_driver: An existing i2c driver object
             If not provided, a driver object is created
-        :type i2c_driver: I2CDriver, optional
         """
 
         # Use address if provided, otherwise pick the default
@@ -486,22 +484,20 @@ class QwiicBMP581(object):
         self.fifo = FifoConfig()
 
     def is_connected(self):
-        """
+        """!
         Determines if this device is connected
 
-        :return: `True` if connected, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if connected, otherwise `False`
         """
         return self._i2c.isDeviceConnected(self.address)
 
     connected = property(is_connected)
 
     def begin(self):
-        """
+        """!
         Initializes this device with default parameters
 
-        :return: Returns `True` if successful, otherwise `False`
-        :rtype: bool
+        @return **bool** Returns `True` if successful, otherwise `False`
         """
         # Confirm device is connected before doing anything
         if not self.is_connected():
@@ -525,11 +521,10 @@ class QwiicBMP581(object):
         return True
     
     def enable_press(self, enable):
-        """
+        """!
         Enables or disables the pressure sensor.
 
-        :param enable: The value to set
-        :type enable: int
+        @param int enable: The value to set
 
         Allowable values:
             - `kEnable`
@@ -539,11 +534,10 @@ class QwiicBMP581(object):
         self.set_osr_odr_press_config()
     
     def set_odr_frequency(self, odr):
-        """
+        """!
         Sets the output data rate of the sensor.
 
-        :param odr: The output data rate to set
-        :type odr: int
+        @param int odr: The output data rate to set
         """
         # check whether ODR is valid
         if odr > self.kOdr0_125Hz:
@@ -553,9 +547,12 @@ class QwiicBMP581(object):
         self.set_osr_odr_press_config()
 
     def set_osr_multipliers(self, config):
+        """!
+        Set the temperature and pressure oversampling multipliers.
+
+        @param OsrOdrPressConfig config: The configuration to set
         """
-        """
-        # check whtehr OSR multipliers are valid
+        # check whether OSR multipliers are valid
         if config.osrT > config.kOversampling128x or config.osrP > config.kOversampling128x:
             return self.kError
         
@@ -564,18 +561,17 @@ class QwiicBMP581(object):
         self.set_osr_odr_press_config()
 
     def soft_reset(self):
-        """
+        """!
         This API performs the soft reset of the sensor.
         """
         self._i2c.write_byte(self.address, self.kRegCmd, self.kSoftResetCmd)
         time.sleep(1e-6 * self.kDelayUsSoftReset)
 
     def get_osr_odr_press_config(self):
-        """
+        """!
         Gets the current oversampling and output data rate configuration
 
-        :return: The current oversampling and output data rate configuration
-        :rtype: OsrOdrPressConfig
+        @return **OsrOdrPressConfig** The current oversampling and output data rate configuration
         """
         osrConfig = self._i2c.read_byte(self.address, self.kRegOsrConfig)
 
@@ -588,7 +584,7 @@ class QwiicBMP581(object):
         return config
     
     def set_osr_odr_press_config(self):
-        """
+        """!
         This API sets the configuration for oversampling temperature, oversampling of pressure 
         and ODR configuration along with pressure enable.
 
@@ -608,11 +604,10 @@ class QwiicBMP581(object):
         self._i2c.write_block(self.address, self.kRegOsrConfig, regData)
 
     def get_iir_config(self):
-        """
+        """!
         Gets the current IIR configuration
 
-        :return: The current IIR configuration
-        :rtype: IirConfig
+        @return **IirConfig** The current IIR configuration
         """
         dspConfig = self._i2c.read_block(self.address, self.kRegDspConfig, 2)
 
@@ -627,11 +622,10 @@ class QwiicBMP581(object):
         return config
     
     def get_power_mode(self):
-        """
+        """!
         Gets the current power mode of the device
 
-        :return: The current power mode or -1 on error
-        :rtype: int
+        @return **int** The current power mode or -1 on error
         """
         odrConfig = self._i2c.read_byte(self.address, self.kRegOdrConfig)
         powerMode = (odrConfig & self.kPowermodeMask) >> self.kPowermodeShift
@@ -656,10 +650,10 @@ class QwiicBMP581(object):
         return self.kError
     
     def set_power_mode(self, powerMode):
-        """
+        """!
         Sets the power mode of the device
 
-        :param powerMode: The power mode to set
+        @param int powerMode: The power mode to set
 
         Allowable powerMode values:
             - `kPowerModeStandby`
@@ -667,8 +661,6 @@ class QwiicBMP581(object):
             - `kPowerModeForced`
             - `kPowerModeContinuous`
             - `kPowerModeDeepStandby`
-
-        :type powerMode: int
         """
         lastMode = self.get_power_mode()
 
@@ -688,12 +680,11 @@ class QwiicBMP581(object):
             self._direct_set_power_mode(powerMode)
     
     def get_sensor_data(self):
-        """
+        """!
         This API reads the temperature(deg C) or both pressure(Pa) and temperature(deg C) data from the
         sensor and store it in the bmp5_sensor_data structure instance passed by the user.
 
-        :return: The sensor data
-        :rtype: SensorData
+        @return **SensorData** The sensor data
         """
         data = SensorData()
 
@@ -711,11 +702,10 @@ class QwiicBMP581(object):
         return data
     
     def get_osr_odr_eff(self):
-        """
+        """!
         This API reads the effective oversampling and output data rate configuration from the sensor.
 
-        :return: The effective oversampling and output data rate configuration
-        :rtype: OsrOdrEff
+        @return **OsrOdrEff** The effective oversampling and output data rate configuration
         """
         regData = self._i2c.read_block(self.address, self.kRegOsrEff, 1)
 
@@ -727,7 +717,7 @@ class QwiicBMP581(object):
         return eff
 
     def set_iir_config(self, config):
-        """
+        """!
         This API sets the configuration for IIR of temperature and pressure.
         
         If IIR value for both temperature and pressure is set a value other than bypass then powermode is set
@@ -750,12 +740,11 @@ class QwiicBMP581(object):
             self.set_power_mode(currPwrMode)
 
     def set_oor_configuration(self, config):
-        """
+        """!
         This API sets the configuration for out-of-range pressure threshold, range
         count limit and IIR.
 
-        :param config: The configuration to set
-        :type config: OorPressConfiguration
+        @param OorPressConfiguration config: The configuration to set
         """
 
         self._set_oor_iir_count_limit(config.oorSeliirP, config.oorCntLim)
@@ -772,29 +761,26 @@ class QwiicBMP581(object):
         self._i2c.write_block(self.address, self.kRegOorThrPLsb, regData)
         
     def configure_interrupt(self, intMode, intPol, intOd, intEn):
-        """
+        """!
         This API is used to configure the interrupt settings.
 
-        :param intMode: The interrupt mode to set
-        :type intMode: int
+        @param int intMode: The interrupt mode to set
+
         Allowable values:
             - `kIntModePulsed`
             - `kIntModeLatched`
+        @param int intPol: The interrupt polarity to set
 
-        :param intPol: The interrupt polarity to set
-        :type intPol: int
         Allowable values:
             - `kIntPolActiveLow`
             - `kIntPolActiveHigh`
+        @param int intOd: The interrupt output type to set
 
-        :param intOd: The interrupt output type to set
-        :type intOd: int
         Allowable values:
             - `kIntOdPushPull`
             - `kIntOdOpenDrain`
-        
-        :param intEn: The interrupt enable to set
-        :type intEn: int
+        @param int intEn: The interrupt enable to set
+
         Allowable values:
             - `kEnable`
             - `kDisable`
@@ -819,12 +805,11 @@ class QwiicBMP581(object):
         self._i2c.write_byte(self.address, self.kRegIntConfig, regData)
     
     def int_source_select(self, select):
-        """
+        """!
         This API is used to enable the interrupts(drdy interrupt, fifo full interrupt,
         fifo threshold enable and pressure data out of range interrupt).
 
-        :param select: The interrupt source select to set
-        :type select: intSourceSelect
+        @param intSourceSelect select: The interrupt source select to set
         """
         regData = self._i2c.read_byte(self.address, self.kRegIntSource)
 
@@ -836,13 +821,13 @@ class QwiicBMP581(object):
         self._i2c.write_byte(self.address, self.kRegIntSource, regData)
     
     def get_interrupt_status(self):
-        """
+        """!
         This API is used to get interrupt status.
         """
         return self._i2c.read_byte(self.address, self.kRegIntStatus)
     
     def set_fifo_configuration(self, fifo):
-        """
+        """!
         This API used to set the configurations of fifo in the sensor.
         
         If Fifo frame selection is enabled then powermode is set as standby mode, as fifo frame selection
@@ -874,11 +859,10 @@ class QwiicBMP581(object):
         self._i2c.write_byte(self.address, self.kRegFifoSel, regData)
 
     def get_fifo_len(self, fifo):
-        """
-        This API is used to get the length of FIFO data available in the sensor. 
+        """!
+        This API is used to get the length of FIFO data available in the sensor.
 
-        :param fifo: The fifo configuration
-        :type fifo: FifoConfiguration
+        @param FifoConfiguration fifo: The fifo configuration
         """
 
         regData = self._i2c.read_byte(self.address, self.kRegFifoCount)
@@ -893,11 +877,10 @@ class QwiicBMP581(object):
         return 0
 
     def get_fifo_data(self, fifo):
-        """
+        """!
         This API is used to read the FIFO data from the sensor.
 
-        :param fifo: The fifo configuration
-        :type fifo: FifoConfiguration
+        @param FifoConfiguration fifo: The fifo configuration
         """
         fifoLen = self.get_fifo_len(fifo)
 
@@ -909,7 +892,7 @@ class QwiicBMP581(object):
         fifo.data[:] = list(regData)[:]
 
     def extract_fifo_data(self, fifo, sensorData):
-        """
+        """!
         This API extract the temperature and/or pressure data from the fifo data which is
         already read from the fifo.
         """
@@ -923,11 +906,10 @@ class QwiicBMP581(object):
             idx += 1
 
     def nvm_read(self, nvmAddr):
-        """
+        """!
         This API is used to perform NVM reads.
-        
-        :param nvmAddr: The NVM address to read
-        :type nvmAddr: int
+
+        @param int nvmAddr: The NVM address to read
         """
         currPwrMode = self._nvm_write_addr(nvmAddr, self.kDisable)
 
@@ -974,7 +956,7 @@ class QwiicBMP581(object):
 
     # Private Methods
     def _power_up_check(self):
-        """
+        """!
         This internal API is used to validate the post power-up procedure. Not to be used outside of driver.
         """
         nvmStatus = self._get_nvm_status()
@@ -986,7 +968,7 @@ class QwiicBMP581(object):
         return False
     
     def _validate_chip_id(self, chipId):
-        """
+        """!
         This internal API is used to validate the chip id of the sensor. Not to be used outside of driver.
         """
         if chipId == self.kChipId:
@@ -994,11 +976,10 @@ class QwiicBMP581(object):
         return False
 
     def _check_deepstandby_mode(self):
-        """
+        """!
         Checks if the device is in deepstandby mode. Not to be used outside of driver.
 
-        :return: `True` if in deepstandby mode, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if in deepstandby mode, otherwise `False`
         """
 
         fifoFrameSel = self._i2c.read_byte(self.address, self.kRegFifoSel)
@@ -1016,7 +997,7 @@ class QwiicBMP581(object):
         return False
     
     def _set_deepstandby_mode(self):
-        """
+        """!
         This function is used to set the device to deepstandby mode. Not to be used outside of driver.
         """
         regData = self._i2c.read_byte(self.address, self.kRegOdrConfig)
@@ -1040,7 +1021,7 @@ class QwiicBMP581(object):
         self._i2c.write_byte(self.address, self.kRegFifoSel, regData)
     
     def _set_standby_mode(self):
-        """
+        """!
         This function is used to set the device to standby powermode when powermoide is deepstandby mode. Not to be used outside of driver.
         """
         powerMode = self.get_power_mode()
@@ -1048,10 +1029,10 @@ class QwiicBMP581(object):
             self.set_power_mode(self.kPowerModeStandby)
     
     def _direct_set_power_mode(self, powerMode):
-        """
+        """!
         Sets the power mode of the device. Not to be used outside of driver
 
-        :param powerMode: The power mode to set
+        @param int powerMode: The power mode to set
 
         Allowable powerMode values:
             - `kPowerModeStandby`
@@ -1059,8 +1040,6 @@ class QwiicBMP581(object):
             - `kPowerModeForced`
             - `kPowerModeContinuous`
             - `kPowerModeDeepStandby`
-
-        :type powerMode: int
         """
         odrConfig = self._i2c.read_byte(self.address, self.kRegOdrConfig)
         
@@ -1073,7 +1052,7 @@ class QwiicBMP581(object):
         self._i2c.write_byte(self.address, self.kRegOdrConfig, odrConfig)
 
     def _direct_set_iir_config(self, config):
-        """
+        """!
         Sets the IIR for temperature and pressure. Not to be used outside of driver.
         """
         regData = list(self._i2c.read_block(self.address, self.kRegDspConfig, 2))
@@ -1096,7 +1075,7 @@ class QwiicBMP581(object):
         self._i2c.write_block(self.address, self.kRegDspIir, regData)
 
     def _set_oor_iir_count_limit(self, setOorIirP, setCountLimit):
-        """
+        """!
         This internal API sets the IIR configuration and count limit of OOR pressure.
         """
         currPwrMode = self.get_power_mode()
@@ -1125,7 +1104,7 @@ class QwiicBMP581(object):
             self.set_power_mode(currPwrMode)
 
     def _set_fifo_iir_config(self, setFifoIirT, setFifoIirP):
-        """
+        """!
         Sets the configuration for IIR of fifo. Not to be used outside of driver.
         """
         currPwrMode = self.get_power_mode()
@@ -1149,11 +1128,10 @@ class QwiicBMP581(object):
             self.set_power_mode(currPwrMode)
         
     def _set_fifo_threshold(self, regData, fifo):
-        """
+        """!
         This internal API is used to set fifo threshold based on the frame type selected. Not to be used outside of driver.
 
-        :param fifo: The fifo configuration
-        :type fifo: FifoConfiguration
+        @param FifoConfiguration fifo: The fifo configuration
 
         return: kNoError on success, kError on failure
         """
@@ -1172,19 +1150,15 @@ class QwiicBMP581(object):
         return self.kNoError
 
     def _unpack_sensor_data(self, sensorData, dataIndex, fifo):
-        """
+        """!
         This internal API is used to unpack the FIFO data and store it in the sensorData parameter
 
-        :param sensorData: The sensor data
-        :type sensorData: SensorData
+        @param SensorData sensorData: The sensor data
+        @param int dataIndex: The data index
+        @param FifoConfiguration fifo: The fifo configuration
 
-        :param dataIndex: The data index
-        :type dataIndex: int
-
-        :param fifo: The fifo configuration
-        :type fifo: FifoConfiguration
-
-        :return: True on success, False on failure/frame empty
+        @return  True on success, False on failure/frame empty
+        
         """
         res = True 
         if fifo.frameSel == fifo.kFifoTemperatureData:
@@ -1229,13 +1203,13 @@ class QwiicBMP581(object):
         return res
 
     def _get_nvm_status(self):
-        """
+        """!
         This API is used to get the status of NVM data. Not to be used outside of driver.
         """
         return self._i2c.read_byte(self.address, self.kRegStatus)
 
     def _get_nvm_data(self):
-        """
+        """!
         This internal API is used to read the nvm data
         """
         nvmStatus = self._get_nvm_status()
@@ -1247,14 +1221,12 @@ class QwiicBMP581(object):
         return self.kError
 
     def _set_nvm_addr(self, nvmAddr, progEn):
-        """
+        """!
         This internal API is used to set the nvm address and prog_enable based on NVM read/write selected.
 
-        :param nvmAddr: The NVM address to set
-        :type nvmAddr: int
+        @param int nvmAddr: The NVM address to set
+        @param int progEn: The program enable
 
-        :param progEn: The program enable
-        :type progEn: int
         Allowable values:
             - `kEnable`
             - `kDisable`
@@ -1271,19 +1243,15 @@ class QwiicBMP581(object):
             self._i2c.write_byte(self.address, self.kRegNvmAddr, regData)
 
     def _nvm_write_addr(self, nvmAddr, progEn):
-        """
+        """!
         This internal API is used to write the nvm data. Not to be used outside of driver.
 
-        :param nvmAddr: The NVM address to write
-        :type nvmAddr: int
+        @param int nvmAddr: The NVM address to write
+        @param int progEn: The program enable
+        @param int currPwrMode: The current power mode
 
-        :param progEn: The program enable
-        :type progEn: int
-
-        :param currPwrMode: The current power mode
-        :type currPwrMode: int
-
-        :return: The new power mode
+        @return  The new power mode
+        
         """
         currPwrMode = self.kError
 
