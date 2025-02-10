@@ -1,9 +1,10 @@
 {
     "urls": [
-      ["qwiic_bmp581.py", "github:sparkfun/Qwiic_BMP581_Py/qwiic_bmp581.py"]
-    ],
-    "deps": [
-      ["github:sparkfun/Qwiic_I2C_Py", "master"]
+      ["qwiic_bmp581_py_examples/qwiic_bmp581_ex1_basic.py", "github:sparkfun/qwiic_bmp581_py/examples/qwiic_bmp581_ex1_basic.py"],
+      ["qwiic_bmp581_py_examples/qwiic_bmp581_ex4_filtering.py", "github:sparkfun/qwiic_bmp581_py/examples/qwiic_bmp581_ex4_filtering.py"],
+      ["qwiic_bmp581_py_examples/qwiic_bmp581_ex5_oversampling.py", "github:sparkfun/qwiic_bmp581_py/examples/qwiic_bmp581_ex5_oversampling.py"],
+      ["qwiic_bmp581_py_examples/qwiic_bmp581_ex7_nvm.py", "github:sparkfun/qwiic_bmp581_py/examples/qwiic_bmp581_ex7_nvm.py"],
+      ["qwiic_bmp581_py_examples/qwiic_bmp581_ex8_low_power.py", "github:sparkfun/qwiic_bmp581_py/examples/qwiic_bmp581_ex8_low_power.py"]
     ],
     "version": "1.0.0"
 }
