@@ -30,7 +30,8 @@ New to qwiic? Take a look at the entire [SparkFun qwiic ecosystem](https://www.s
 
 This Python package supports the following SparkFun qwiic products on Python, MicroPython and Circuit python. 
 
-* [SparkFun Digital to Analog Converter Sensor - BMP581](https://www.sparkfun.com/products/20170)
+* [SparkFun Pressure Sensor - BMP581](https://www.sparkfun.com/sparkfun-pressure-sensor-bmp581-qwiic.html)
+* [SparkFun Micro Pressure Sensor - BMP581](https://www.sparkfun.com/sparkfun-micro-pressure-sensor-bmp581-qwiic.html)
 
 ### Supported Platforms
 
